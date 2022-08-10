@@ -1,2 +1,2 @@
 # pivid-control
-Layer for controlling pivid stuff
+Layer for controlling pivid.
