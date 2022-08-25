@@ -3,17 +3,19 @@
 import argparse
 import time
 import apscheduler
+
+import pivid_control
 import pivid_server
 import signal
 import video_composition
 
 
 def main(args):
-    server = pivid_server.PividServer(args.server)
-    comp = video_composition.VideoComposition(server)
-    comp.load_json(args.config_file)
-    comp.start_scene('fullscreen', 'cit_005')
-    comp.send_update()
+    pivid = pivid_control.PividControl(args)
+    pivid.start_scene('fullscreen', 'intro_star')
+    pivid.comp.send_update()
+    pivid.run_forever()
+
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # Sane ^C behavior.

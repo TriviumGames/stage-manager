@@ -2,6 +2,16 @@ import urllib.parse
 import requests
 import pprint
 
+class MockPividServer:
+
+    def get_media_duration(self, filename):
+        return 5.
+
+    def send_script(self, script):
+        pp = pprint.PrettyPrinter()
+        pp.pprint(script)
+
+
 class PividServer:
     def __init__(self, url):
         if ':' not in url:

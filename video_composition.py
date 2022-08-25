@@ -2,6 +2,7 @@ import json
 import math
 import time
 import copy
+import scene_events
 
 class VideoComposition:
     def __init__(self, pivid_server):
@@ -30,11 +31,13 @@ class VideoComposition:
             if 'layers' not in scene:
                 scene['layers'] = []
             for layer in scene['layers']:
-                if 'play' not in layer:
+                if 'play' not in layer :
                     layer['play'] = {
                         't': [0, self.get_media_duration(layer['media'])],
                         'rate': 1
                     }
+                if 't' not in layer['play']:
+                    layer['play']['t'] = [0, self.get_media_duration(layer['media'])]
             if 'next_scenes' not in scene:
                 scene['next_scenes'] = []
         for scene_id, scene in self.source['scenes'].items():
@@ -43,6 +46,10 @@ class VideoComposition:
             for next_scene in scene['next_scenes']:
                 for layer in self.source['scenes'][next_scene]['layers']:
                     scene['preloads'].add(layer['media'])
+            if 'autopilot' in scene:
+                for layer in self.source['scenes'][scene['autopilot']]['layers']:
+                    scene['preloads'].add(layer['media'])
+
         for vp in self.source['viewports']:
             vp['current_scene'] = 'None'
             vp['time_base'] = 0
@@ -61,11 +68,28 @@ class VideoComposition:
             return math.inf
         return max(map(lambda l: self.get_layer_duration(l), scene['layers']))
 
-    def start_scene(self, viewport_id, scene_id, start_at_the_beginning = True):
+    def start_scene(self, viewport_id, scene_id, start_time = None):
+        if start_time is None:
+            start_time = time.time()
         vp = self.viewports[viewport_id]
         vp['current_scene'] = scene_id
-        if start_at_the_beginning:
-            vp['time_base'] = time.time()
+        vp['time_base'] = start_time
+        scene = self.source['scenes'][scene_id]
+        events = []
+        if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
+            next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
+            events.append(scene_events.AutopilotEvent(next_autopilot_time, viewport_id, scene['autopilot'], next_autopilot_time))
+        return events
+
+    def change_scene(self, viewport_id, scene_id):
+        vp = self.viewports[viewport_id]
+        vp['current_scene'] = scene_id
+        scene = self.source['scenes'][scene_id]
+        events = []
+        if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
+            next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
+            events.append(scene_events.AutopilotEvent(next_autopilot_time, viewport_id, scene['autopilot'], next_autopilot_time))
+        return events
 
     def time_shift_layer(self, layer, start_time):
         l = copy.deepcopy(layer)
@@ -96,6 +120,6 @@ class VideoComposition:
                 for layer in next_scene['layers']:
                     screen['layers'].append(self.time_shift_layer(layer, next_scene_start))
         for media in preloads:
-            update['buffer_tuning'][media] = {'pin': 0.2}
+            update['buffer_tuning'][media] = {'pin': 1}
         self.pivid_server.send_script(update)
 

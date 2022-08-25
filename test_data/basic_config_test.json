@@ -15,6 +15,55 @@
 		}
 	],
 	"scenes": {
+		"intro_star": {
+			"layers": [
+				{
+					"media": "intro_star.mkv"
+				}
+			],
+			"autopilot": "spinning_star_idle",
+			"next_scenes": ["intro_star"]
+		},
+		"spinning_star_idle": {
+			"layers": [
+				{
+					"media": "spinning_star.mkv"
+				}
+			],
+			"autopilot": "spinning_star_idle",
+			"next_scenes": ["spinning_star_done", "outro_star"]
+		},
+		"spinning_star_done": {
+			"layers": [
+				{
+					"media": "spinning_star.mkv"
+				}
+			],
+			"autopilot": "outro_star"
+		},
+		"outro_star": {
+			"layers": [
+				{
+					"media": "outro_star.mkv"
+				}
+			],
+			"autopilot": "jellyfish",
+			"next_scenes": ["intro_star", "jellyfish"]
+		},
+		"jellyfish": {
+			"layers": [
+				{
+					"media": "jellyfish-3-mbps-hd-hevc.mkv",
+					"play": {
+						"rate": 1,
+						"repeat": true
+					}
+				}
+			],
+			"next_scenes": ["intro_star"]
+
+		},
+
 		"cit_005": {
 			"layers": [
 				{
@@ -27,12 +76,11 @@
 		"cit_010a": {
 			"layers": [
 				{
-					"media": "cit003_010_L.mov",
-					"repeat": true
+					"media": "cit003_010_L.mov"
 				}
 			],
 			"next_scenes": ["cit_010b"],
-			"autopilot": "cit_010b"
+			"autopilot": "cit_010a"
 		},
 		"cit_010b": {
 			"layers": [
