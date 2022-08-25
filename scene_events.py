@@ -4,10 +4,10 @@ from datetime import datetime
 @dataclass
 class AutopilotEvent:
     time: float
-    viewport_id: str
+    stage_id: str
     scene_id: str
     start_time: float
 
     def register(self, pivid_control):
         when = datetime.fromtimestamp(self.time)
-        return pivid_control.scheduler.add_job(lambda: pivid_control.start_scene(self.viewport_id, self.scene_id, self.start_time), 'date', run_date=when)
+        return pivid_control.scheduler.add_job(lambda: pivid_control.start_scene(self.stage_id, self.scene_id, self.start_time), 'date', run_date=when)

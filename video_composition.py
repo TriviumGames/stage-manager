@@ -8,7 +8,7 @@ class VideoComposition:
     def __init__(self, pivid_server):
         self.pivid_server = pivid_server
         self.duration_cache = dict()
-        self.viewports = dict()
+        self.stages = dict()
 
     def get_media_duration(self, filename) -> float:
         if filename in self.duration_cache:
@@ -23,7 +23,7 @@ class VideoComposition:
         with open(filename, 'r') as f:
             self.source = json.load(f)
         assert 'outputs' in self.source
-        assert 'viewports' in self.source
+        assert 'stages' in self.source
         assert 'scenes' in self.source
         # precache media durations, so we're ready to go without a million queries
         self.source['scenes']['None'] = {}
@@ -50,10 +50,10 @@ class VideoComposition:
                 for layer in self.source['scenes'][scene['autopilot']]['layers']:
                     scene['preloads'].add(layer['media'])
 
-        for vp in self.source['viewports']:
+        for vp in self.source['stages']:
             vp['current_scene'] = 'None'
             vp['time_base'] = 0
-            self.viewports[vp['name']] = vp
+            self.stages[vp['name']] = vp
 
     def get_layer_duration(self, layer) -> float:
         if 'opacity' in layer and layer['opacity'] is 0:
@@ -68,27 +68,27 @@ class VideoComposition:
             return math.inf
         return max(map(lambda l: self.get_layer_duration(l), scene['layers']))
 
-    def start_scene(self, viewport_id, scene_id, start_time = None):
+    def start_scene(self, stage_id, scene_id, start_time = None):
         if start_time is None:
             start_time = time.time()
-        vp = self.viewports[viewport_id]
+        vp = self.stages[stage_id]
         vp['current_scene'] = scene_id
         vp['time_base'] = start_time
         scene = self.source['scenes'][scene_id]
         events = []
         if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
             next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
-            events.append(scene_events.AutopilotEvent(next_autopilot_time, viewport_id, scene['autopilot'], next_autopilot_time))
+            events.append(scene_events.AutopilotEvent(next_autopilot_time, stage_id, scene['autopilot'], next_autopilot_time))
         return events
 
-    def change_scene(self, viewport_id, scene_id):
-        vp = self.viewports[viewport_id]
+    def change_scene(self, stage_id, scene_id):
+        vp = self.stages[stage_id]
         vp['current_scene'] = scene_id
         scene = self.source['scenes'][scene_id]
         events = []
         if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
             next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
-            events.append(scene_events.AutopilotEvent(next_autopilot_time, viewport_id, scene['autopilot'], next_autopilot_time))
+            events.append(scene_events.AutopilotEvent(next_autopilot_time, stage_id, scene['autopilot'], next_autopilot_time))
         return events
 
     def time_shift_layer(self, layer, start_time):
@@ -106,7 +106,7 @@ class VideoComposition:
         for id, screen in update['screens'].items():
             screen['layers'] = list()
         preloads = set()
-        for vp in self.source['viewports']:
+        for vp in self.source['stages']:
             screen = update['screens'][vp['output']]
             scene = self.source['scenes'][vp['current_scene']]
             preloads.update(scene['preloads'])

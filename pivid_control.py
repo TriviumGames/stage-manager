@@ -25,37 +25,37 @@ class PividControl:
         self.osc_server = None
         self.start_time = time.time()
         self.scheduler = AsyncIOScheduler()
-        self.scene_jobs = dict() # map of viewport_id to list of pending job
+        self.scene_jobs = dict() # map of stage_id to list of pending job
 
-    def register_scene_events(self, viewport_id, events):
-        if viewport_id in self.scene_jobs:
-            for job in self.scene_jobs[viewport_id]:
+    def register_scene_events(self, stage_id, events):
+        if stage_id in self.scene_jobs:
+            for job in self.scene_jobs[stage_id]:
                 if self.scheduler.get_job(job.id) is not None:
                     job.remove()
-            self.scene_jobs[viewport_id].clear()
+            self.scene_jobs[stage_id].clear()
         else:
-            self.scene_jobs[viewport_id] = []
+            self.scene_jobs[stage_id] = []
 
         for evt in events:
-            self.scene_jobs[viewport_id].append(evt.register(self))
+            self.scene_jobs[stage_id].append(evt.register(self))
 
 
     def osc_start_scene(self, address, *args):
         print(f"{time.time() - self.start_time} {address}:  {args}")
         self.start_scene(args[0], args[1])
 
-    def start_scene(self, viewport_id, scene_id, start_time = None):
-        events = self.comp.start_scene(viewport_id, scene_id, start_time)
-        self.register_scene_events(viewport_id, events)
+    def start_scene(self, stage_id, scene_id, start_time = None):
+        events = self.comp.start_scene(stage_id, scene_id, start_time)
+        self.register_scene_events(stage_id, events)
         self.comp.send_update()
 
     def osc_change_scene(self, address, *args):
         print(f"{time.time() - self.start_time} {address}:  {args}")
         self.change_scene(args[0], args[1])
 
-    def change_scene(self, viewport_id, scene_id):
-        events = self.comp.change_scene(viewport_id, scene_id)
-        self.register_scene_events(viewport_id, events)
+    def change_scene(self, stage_id, scene_id):
+        events = self.comp.change_scene(stage_id, scene_id)
+        self.register_scene_events(stage_id, events)
         self.comp.send_update()
 
 

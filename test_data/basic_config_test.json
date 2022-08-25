@@ -6,7 +6,7 @@
 			"update_hz": 30
 		}
 	},
-	"viewports":
+	"stages":
 	[
 		{
 			"name": "fullscreen",
