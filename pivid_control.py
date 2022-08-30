@@ -8,6 +8,7 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import scene_events
+import network_notifier
 
 
 class PividControl:
@@ -16,6 +17,7 @@ class PividControl:
             self.pivid_server = pivid_server.MockPividServer()
         else:
             self.pivid_server = pivid_server.PividServer(args.server)
+        self.network_notifier = network_notifier.NetworkNotifier(args)
         self.comp = video_composition.VideoComposition(self.pivid_server)
         self.comp.load_json(args.config_file)
         self.osc_dispatcher = Dispatcher()
@@ -39,7 +41,6 @@ class PividControl:
         for evt in events:
             self.scene_jobs[stage_id].append(evt.register(self))
 
-
     def osc_start_scene(self, address, *args):
         print(f"{time.time() - self.start_time} {address}:  {args}")
         self.start_scene(args[0], args[1])
@@ -47,6 +48,7 @@ class PividControl:
     def start_scene(self, stage_id, scene_id, start_time = None):
         events = self.comp.start_scene(stage_id, scene_id, start_time)
         self.register_scene_events(stage_id, events)
+        self.network_notifier.send_scene_start(stage_id, scene_id)
         self.comp.send_update()
 
     def osc_change_scene(self, address, *args):

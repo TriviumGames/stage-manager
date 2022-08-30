@@ -56,7 +56,7 @@ class VideoComposition:
             self.stages[vp['name']] = vp
 
     def get_layer_duration(self, layer) -> float:
-        if 'opacity' in layer and layer['opacity'] is 0:
+        if 'opacity' in layer and layer['opacity'] == 0:
             return 0
         if 'repeat' in layer and layer['repeat']:
             return math.inf
@@ -79,6 +79,10 @@ class VideoComposition:
         if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
             next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
             events.append(scene_events.AutopilotEvent(next_autopilot_time, stage_id, scene['autopilot'], next_autopilot_time))
+        if 'cues' in scene:
+            for cue in scene['cues']:
+                cue_time = vp['time_base'] + cue['t']
+                events.append(scene_events.CueEvent(cue_time, cue['addr'], cue['args']))
         return events
 
     def change_scene(self, stage_id, scene_id):

@@ -18,7 +18,8 @@ class PividServer:
         if ':' not in url:
             url = f"http://{url}:31415"
         if 'http' not in url:
-            url = urllib.parse.urljoin('http://', url)
+            url = "http://" + url
+        print(f"Using Pivid server {url}\n")
         self.url = url
         self.play_url = urllib.parse.urljoin(url, "/play")
 
@@ -30,7 +31,7 @@ class PividServer:
         if not r.json().get("ok"):
             raise ValueError(f"{media_url}: {r.json().get('error', 'Not OK')}")
         duration = r.json().get("media").get("duration")
-        print(f"Media duration took {time.time() - now}s\n")
+        print(f"Media duration check took {time.time() - now}s")
         return duration
 
     def send_script(self, script):

@@ -21,6 +21,13 @@
 					"media": "intro_star.mkv"
 				}
 			],
+			"cues": [
+				{
+					"t": 0.25,
+					"addr": "/asdf/basdf",
+					"args": [ 1, 1.2]
+				}
+			],
 			"autopilot": "spinning_star_idle",
 			"next_scenes": ["intro_star"]
 		},
@@ -47,8 +54,8 @@
 					"media": "outro_star.mkv"
 				}
 			],
-			"autopilot": "jellyfish",
-			"next_scenes": ["intro_star", "jellyfish"]
+			"_autopilot": "jellyfish",
+			"next_scenes": ["intro_star"]
 		},
 		"jellyfish": {
 			"layers": [
