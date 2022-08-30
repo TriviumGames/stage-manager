@@ -48,8 +48,8 @@ class PividControl:
     def start_scene(self, stage_id, scene_id, start_time = None):
         events = self.comp.start_scene(stage_id, scene_id, start_time)
         self.register_scene_events(stage_id, events)
-        self.network_notifier.send_scene_start(stage_id, scene_id)
         self.comp.send_update()
+        self.network_notifier.send_scene_start(stage_id, scene_id)
 
     def osc_change_scene(self, address, *args):
         print(f"{time.time() - self.start_time} {address}:  {args}")

@@ -24,8 +24,8 @@
 			"cues": [
 				{
 					"t": 0.25,
-					"addr": "/asdf/basdf",
-					"args": [ 1, 1.2]
+					"addr": "/testcue",
+					"args": [ "string", 1, 1.1]
 				}
 			],
 			"autopilot": "spinning_star_idle",
