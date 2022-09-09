@@ -9,8 +9,8 @@ $ pip3 install <package name>
 
 The following packages are needed. Install them using pip3 (see above)
 
-* `[python-osc](https://python-osc.readthedocs.io/en/latest/)`, an OSC communication library
-* `[apscheduler](https://apscheduler.readthedocs.io/en/3.x/index.html)`, a task scheduling library
+* [`python-osc`](https://python-osc.readthedocs.io/en/latest/), an OSC communication library
+* [`apscheduler`](https://apscheduler.readthedocs.io/en/3.x/index.html), a task scheduling library
 
 ## Running
 
