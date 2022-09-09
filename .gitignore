@@ -131,3 +131,5 @@ dmypy.json
 # Macos nonsense
 ._.DS_Store
 ._.DS_Store/
+.DS_Store
+

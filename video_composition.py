@@ -31,13 +31,19 @@ class VideoComposition:
             if 'layers' not in scene:
                 scene['layers'] = []
             for layer in scene['layers']:
+                layer_duration = self.get_layer_duration(layer)
                 if 'play' not in layer :
                     layer['play'] = {
-                        't': [0, self.get_media_duration(layer['media'])],
-                        'rate': 1
+                        't': [0]
                     }
+                    if layer_duration:
+                        layer['play']['t'].append(layer_duration)
+                        layer['play']['rate'] =  1
+
                 if 't' not in layer['play']:
-                    layer['play']['t'] = [0, self.get_media_duration(layer['media'])]
+                    layer['play']['t'] = [0]
+                    if layer_duration:
+                        layer['play']['t'].append(layer_duration)
             if 'next_scenes' not in scene:
                 scene['next_scenes'] = []
         for scene_id, scene in self.source['scenes'].items():
@@ -50,10 +56,13 @@ class VideoComposition:
                 for layer in self.source['scenes'][scene['autopilot']]['layers']:
                     scene['preloads'].add(layer['media'])
 
-        for vp in self.source['stages']:
-            vp['current_scene'] = 'None'
-            vp['time_base'] = 0
-            self.stages[vp['name']] = vp
+        for stage in self.source['stages']:
+            stage['current_scene'] = 'None'
+            stage['time_base'] = 0
+            rect = stage['rect']
+            stage['to_xy'] = rect[0:2]
+            stage['to_size'] = [rect[2] - rect[0], rect[3] - rect[1]]
+            self.stages[stage['name']] = stage
 
     def get_layer_duration(self, layer) -> float:
         if 'opacity' in layer and layer['opacity'] == 0:
@@ -64,9 +73,16 @@ class VideoComposition:
 
     def get_scene_duration(self, scene_id) -> float:
         scene = self.source['scenes'][scene_id]
+        if 'duration' in scene:
+            return scene['duration']
         if not scene['layers']:
             return math.inf
-        return max(map(lambda l: self.get_layer_duration(l), scene['layers']))
+        duration = 0
+        for layer in scene['layers']:
+            layer_duration = self.get_layer_duration(layer)
+            if layer_duration:
+                duration = max(duration, layer_duration)
+        return duration
 
     def start_scene(self, stage_id, scene_id, start_time = None):
         if start_time is None:
@@ -95,8 +111,12 @@ class VideoComposition:
             events.append(scene_events.AutopilotEvent(next_autopilot_time, stage_id, scene['autopilot'], next_autopilot_time))
         return events
 
-    def time_shift_layer(self, layer, start_time):
+    def adjust_layer(self, layer, start_time, stage):
         l = copy.deepcopy(layer)
+        if 'to_size' not in l:
+            l['to_size'] = stage['to_size']
+        if 'to_xy' not in l:
+            l['to_xy'] = stage['to_xy']
         l['play']['t'] = [t + start_time for t in l['play']['t']]
         return l
 
@@ -110,20 +130,20 @@ class VideoComposition:
         for id, screen in update['screens'].items():
             screen['layers'] = list()
         preloads = set()
-        for vp in self.source['stages']:
-            screen = update['screens'][vp['output']]
-            scene = self.source['scenes'][vp['current_scene']]
+        for stage in self.source['stages']:
+            screen = update['screens'][stage['output']]
+            scene = self.source['scenes'][stage['current_scene']]
             preloads.update(scene['preloads'])
-            scene_start = vp['time_base']
+            scene_start = stage['time_base']
             for layer in scene['layers']:
-                screen['layers'].append(self.time_shift_layer(layer, scene_start))
-            next_scene_start = scene_start + self.get_scene_duration(vp['current_scene'])
+                screen['layers'].append(self.adjust_layer(layer, scene_start, stage))
+            next_scene_start = scene_start + self.get_scene_duration(stage['current_scene'])
             if 'autopilot' in scene and next_scene_start < math.inf:
                 next_scene_id = scene['autopilot']
                 next_scene = self.source['scenes'][next_scene_id]
                 for layer in next_scene['layers']:
-                    screen['layers'].append(self.time_shift_layer(layer, next_scene_start))
+                    screen['layers'].append(self.adjust_layer(layer, next_scene_start, stage))
         for media in preloads:
-            update['buffer_tuning'][media] = {'pin': 1}
+            update['buffer_tuning'][media] = {'pin': 0.5}
         self.pivid_server.send_script(update)
 

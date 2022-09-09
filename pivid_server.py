@@ -2,6 +2,7 @@ import urllib.parse
 import requests
 import time
 import pprint
+import math
 
 class MockPividServer:
 
@@ -31,7 +32,7 @@ class PividServer:
         if not r.json().get("ok"):
             raise ValueError(f"{media_url}: {r.json().get('error', 'Not OK')}")
         duration = r.json().get("media").get("duration")
-        print(f"Media duration check took {time.time() - now}s")
+        print(f"Media duration check {filename} yielded {duration} and took {time.time() - now}s")
         return duration
 
     def send_script(self, script):

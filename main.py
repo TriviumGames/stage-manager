@@ -12,7 +12,6 @@ import video_composition
 
 def main(args):
     pivid = pivid_control.PividControl(args)
-    pivid.start_scene('fullscreen', 'intro_star')
     pivid.comp.send_update()
     pivid.run_forever()
 
