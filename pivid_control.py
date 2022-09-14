@@ -23,10 +23,11 @@ class PividControl:
         self.pivid_config = self.config['pivid']
         self.osc_config = self.config['osc']
 
-#        if args.server == "mock":
-#            self.pivid_server = pivid_server.MockPividServer()
-#        else:
-        self.pivid_server = pivid_server.PividServer(self.pivid_config['server'])
+        if args.mock_pivid:
+            print("Mocking pivid. Neener neener")
+            self.pivid_server = pivid_server.MockPividServer()
+        else:
+            self.pivid_server = pivid_server.PividServer(self.pivid_config['server'])
         self.network_notifier = network_notifier.NetworkNotifier(self.config)
         self.comp = video_composition.VideoComposition(self.pivid_server)
         self.comp.load_from_dict(self.config)
