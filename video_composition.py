@@ -128,7 +128,10 @@ class VideoComposition:
         for id, screen in update['screens'].items():
             screen['layers'] = list()
         preloads = set()
+        scenes = list()
+        print("**************Sending update**************")
         for stage in self.source['stages']:
+            print(f"Stage {stage['name']}: {stage['current_scene']}")
             screen = update['screens'][stage['output']]
             scene = self.source['scenes'][stage['current_scene']]
             preloads.update(scene['preloads'])
