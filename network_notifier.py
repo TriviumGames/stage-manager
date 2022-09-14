@@ -2,13 +2,14 @@ from pythonosc import udp_client
 
 
 class NetworkNotifier:
-    def __init__(self, args):
-        if args.osc_server:
-            parts = args.osc_server.split(':')
+    def __init__(self, config):
+        self.osc_server = config.get('osc', {}).get('server')
+        if self.osc_server:
+            parts = self.osc_server.split(':')
             if len(parts) != 2:
-                raise ValueError(f"Incorrect osc_server parameter '{args.osc_server}'. Should be hostname:port.")
+                raise ValueError(f"Incorrect osc_server parameter '{self.osc_server}'. Should be hostname:port.")
             self.osc_client = udp_client.SimpleUDPClient(parts[0], int(parts[1]))
-            self.osc_scene_start_address = args.osc_scene_start_address
+            self.osc_scene_start_address = config.get('osc', {}).get('scene_change_address')
         else:
             self.osc_client = None
 
