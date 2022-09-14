@@ -18,7 +18,7 @@ class PividControl:
         for filename in glob.iglob(f'{args.config_dir}/*.json'):
             print(f"Loading config file {filename}")
             with open(filename, 'r') as f:
-                self.config.update(json.load(f))
+                self.config = PividControl.merge_dicts(self.config, json.load(f))
 
         self.pivid_config = self.config['pivid']
         self.osc_config = self.config['osc']
@@ -39,6 +39,21 @@ class PividControl:
         self.start_time = time.time()
         self.scheduler = AsyncIOScheduler()
         self.scene_jobs = dict() # map of stage_id to list of pending job
+
+    def merge_dicts( a, b, path=None):
+        "merges b into a"
+        if path is None: path = []
+        for key in b:
+            if key in a:
+                if isinstance(a[key], dict) and isinstance(b[key], dict):
+                    PividControl.merge_dicts(a[key], b[key], path + [str(key)])
+                elif a[key] == b[key]:
+                    pass  # same leaf value
+                else:
+                    raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+            else:
+                a[key] = b[key]
+        return a
 
     def register_scene_events(self, stage_id, events):
         if stage_id in self.scene_jobs:

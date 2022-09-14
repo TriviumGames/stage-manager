@@ -1,0 +1,35 @@
+{
+  "scenes": {
+
+		"cit_005": {
+			"layers": [
+				{
+					"media": "cit003_005_N.mov"
+				}
+			],
+			"next_scenes": ["cit_010a", "cit_005"],
+			"autopilot": "cit_010a"
+		},
+		"cit_010a": {
+			"layers": [
+				{
+					"media": "cit003_010_L.mov"
+				}
+			],
+			"next_scenes": ["cit_010b"],
+			"autopilot": "cit_010a"
+		},
+		"cit_010b": {
+			"layers": [
+				{
+					"media": "cit003_010_N.mp4"
+				}
+			],
+			"next_scenes": ["cit_030"],
+			"autopilot": "cit_030"
+		},
+		"cit_030": {
+
+		}
+  }
+}
