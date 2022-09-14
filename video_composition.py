@@ -1,4 +1,3 @@
-import json
 import math
 import time
 import copy
@@ -18,10 +17,9 @@ class VideoComposition:
             self.duration_cache[filename] = duration
             return duration
 
-    def load_json(self, filename) -> dict:
+    def load_from_dict(self, dict):
         self.duration_cache.clear()
-        with open(filename, 'r') as f:
-            self.source = json.load(f)
+        self.source = copy.deepcopy(dict)
         assert 'outputs' in self.source
         assert 'stages' in self.source
         assert 'scenes' in self.source

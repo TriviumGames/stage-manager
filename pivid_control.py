@@ -2,24 +2,34 @@ import asyncio
 import math
 import video_composition
 import time
-import datetime
 import pivid_server
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import scene_events
 import network_notifier
+import glob
+import json
 
 
 class PividControl:
     def __init__(self, args):
+        self.config = dict()
+
+        for filename in glob.iglob(f'{args.config_dir}/*.json'):
+            print(f"Loading config file {filename}")
+            with open(filename, 'r') as f:
+                self.config.update(json.load(f))
+
+        self.pivid_config = self.config['pivid']
+        self.osc_config = self.config['osc']
+
         if args.server == "mock":
             self.pivid_server = pivid_server.MockPividServer()
         else:
             self.pivid_server = pivid_server.PividServer(args.server)
         self.network_notifier = network_notifier.NetworkNotifier(args)
         self.comp = video_composition.VideoComposition(self.pivid_server)
-        self.comp.load_json(args.config_file)
+        self.comp.load_json(self.config)
         self.osc_dispatcher = Dispatcher()
         self.osc_dispatcher.map('/Pivid/StartScene', self.osc_start_scene)
         self.osc_dispatcher.map('/Pivid/ChangeScene', self.osc_change_scene)
