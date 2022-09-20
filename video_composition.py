@@ -57,10 +57,19 @@ class VideoComposition:
         for stage in self.source['stages']:
             stage['current_scene'] = 'None'
             stage['time_base'] = 0
-            rect = stage['rect']
-            stage['to_xy'] = rect[0:2]
-            stage['to_size'] = [rect[2] - rect[0], rect[3] - rect[1]]
+            if 'rect' in stage:
+                rect = stage['rect']
+                stage['to_xy'] = rect[0:2]
+                stage['to_size'] = [rect[2] - rect[0], rect[3] - rect[1]]
+            output = self.source['outputs'][stage['output']]
+            stage['reflect'] = (stage.get('reflect') or False) ^ (output.get('reflect') or False)
+            stage['rotate'] = (stage.get('rotate') or 0) + (output.get('rotate') or 0)
             self.stages[stage['name']] = stage
+
+        for outputid, output in self.source['outputs'].items():
+            print(f"{output}")
+            output.pop('rotate', None)
+            output.pop('reflect', None)
 
     def get_layer_duration(self, layer) -> float:
         if 'opacity' in layer and layer['opacity'] == 0:
@@ -93,10 +102,10 @@ class VideoComposition:
         if self.get_scene_duration(scene_id) < math.inf and 'autopilot' in scene:
             next_autopilot_time = vp['time_base'] + self.get_scene_duration(scene_id)
             events.append(scene_events.AutopilotEvent(next_autopilot_time, stage_id, scene['autopilot'], next_autopilot_time))
-        if 'cues' in scene:
-            for cue in scene['cues']:
-                cue_time = vp['time_base'] + cue['t']
-                events.append(scene_events.CueEvent(cue_time, cue['addr'], cue['args']))
+        if 'stage_direction' in scene:
+            for sd in scene['stage_direction']:
+                sd_time = vp['time_base'] + sd['t']
+                events.append(scene_events.CueEvent(sd_time, sd['addr'], sd['args']))
         return events
 
     def change_scene(self, stage_id, scene_id):
@@ -116,6 +125,12 @@ class VideoComposition:
         if 'to_xy' not in l:
             l['to_xy'] = stage['to_xy']
         l['play']['t'] = [t + start_time for t in l['play']['t']]
+        reflect = (l.get('reflect') or False) ^ (stage.get('reflect') or False)
+        rotate = (l.get('rotate') or 0) + (stage.get('rotate') or 0) % 360
+        if reflect:
+            l['reflect'] = True
+        if rotate:
+            l['rotate'] = rotate
         return l
 
     def send_update(self):

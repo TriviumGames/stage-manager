@@ -6,12 +6,16 @@
 These are physical outputs like HDMI-1, etc, and control the physical resolution and refresh rate, which must be supported by the display device. These settings are directly passed through to Pivid.
 For details see the [Pivid documentation](https://github.com/egnor/pivid/blob/main/doc/script.md)
 
+Outputs can be tagged with `"rotate": 180` and/or `"reflect": true` to affect everything played on that output. 
+
 ### `stages`
 By analog with a theatrical stage, these define regions that `scenes` can be played out on.  They specify an `output`, and optionally a `rect` within that output device.  
 
 A `scene` can never be played without a `stage` to play it on, and each `stage` can be controlled independently.  
 
 `stages` do not have a direct Pivid equivalent.
+
+Stages can be tagged with `"rotate": 180` and/or `"reflect": true` to affect everything played on that stage.  These will not override the output's settings, but will combine with them. 
 
 ### `scenes`
 A scene represents a some group of media that plays, with various playback parameters, timed markers (`cues`) for callbacks, and hints for which scenes to prebuffer.
