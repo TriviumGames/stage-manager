@@ -26,6 +26,7 @@ class VideoComposition:
         # precache media durations, so we're ready to go without a million queries
         self.source['scenes']['None'] = {}
         for scene_id, scene in self.source['scenes'].items():
+            print(f"Processing scene: {scene_id}")
             if 'layers' not in scene:
                 scene['layers'] = []
             for layer in scene['layers']:
