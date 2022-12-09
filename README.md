@@ -36,20 +36,7 @@ Objects
   * Each scene is multiple `layers`, along with some hints for what other scenes might be coming up next (and should thus be pre-loaded).  Scenes have a duration, and an `autopilot` setting, which defines what to play after the scene finishes
 * `layers`
   * A layer is a piece of media, possibly with playback parameters, position and scaling info, opacity, and so on.
-
-## Todo
-
-* Command line argument parsing
-* Play a single scene
-* OSC / MQTT control interface
-  * Play a scene on a stage
-  * Play a scene on a stage without changing time
-  * Produce warning if non-preloaded scene
-  * OSC / MQTT callback interface
-* Autopilot between scenes
   
-## Deferred features
+## Todo-list features
 
-* `stages` as a subset of a screen
-* Fancy control over position
-* Monitor config file for changes
+* Parameterized values (e.g., position)
