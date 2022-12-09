@@ -19,7 +19,7 @@ Stage Manager aims to streamline certain use cases:
 
 Here's some examples of applications that Stage Manager might be useful for:
 
-* A visual Choose Your Own Adventure type game (e.g., [A Heist with Markiplier](https://www.youtube.com/watch?v=9TjfkXmwbTs)
+* A visual Choose Your Own Adventure type game (e.g., [A Heist with Markiplier](https://www.youtube.com/watch?v=9TjfkXmwbTs))
 * A video game with "quick time" events (e.g., [Dragon's Lair](https://en.wikipedia.org/wiki/Dragon%27s_Lair))
 * A fictitious (and fairly simple) industrial control system for an Escape Room
 
