@@ -5,15 +5,13 @@ Stage Manager is an intermediary layer for controlling [Pivid](https://github.co
 
 Stage Manager is currently designed to streamline the use cases _I_ need in _my_ use case. It will probably only be suitable if _your_ use case has significant similarities to mine.
 
-* [Running Stage Manager](doc/running.md)
-* [Scripts](doc/scripts.md)
-
 ## Basic Features
 Stage Manager aims to streamline certain use cases:
 * Seamlessly playing one video when another is done.
 * Reporting when a video has started.
 * Reporting when a time-based "marker" into a video has been passed.
 * Independently controlling playback on different displays, different regions of the same display, or even overlapping regions of the same display.  Each region could even be controlled by a separate process!
+* Video is controlled by network commands.
 * Managing preloaded media based on hints for "next playback" candidates.  
 * Seemlessly transitioning out of a looping video.
 
@@ -23,20 +21,11 @@ Here's some examples of applications that Stage Manager might be useful for:
 * A video game with "quick time" events (e.g., [Dragon's Lair](https://en.wikipedia.org/wiki/Dragon%27s_Lair))
 * A fictitious (and fairly simple) industrial control system for an Escape Room
 
+## Further documentation
 
+* [Running Stage Manager](doc/running.md)
+* [Scripts](doc/scripts.md)
 
-
-Objects
-
-* `outputs`
-  * These are like HDMI-1, etc, and control the physical resolution and refresh rate.
-* `stages`
-  * These define areas that `scenes` can be played on.  For now they are just associated with a output.
-* `scenes`
-  * Each scene is multiple `layers`, along with some hints for what other scenes might be coming up next (and should thus be pre-loaded).  Scenes have a duration, and an `autopilot` setting, which defines what to play after the scene finishes
-* `layers`
-  * A layer is a piece of media, possibly with playback parameters, position and scaling info, opacity, and so on.
-  
 ## Todo-list features
 
 * Parameterized values (e.g., position)
