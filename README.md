@@ -6,7 +6,7 @@ Stage Manager is an intermediary layer for controlling [Pivid](https://github.co
 Stage Manager is currently designed to streamline the use cases _I_ need in _my_ use case. It will probably only be suitable if _your_ use case has significant similarities to mine.
 
 * [Running Stage Manager](doc/running.md)
-* [Scripts](doc/scripts.md)
+* [Scripts & Configuration](doc/scripts.md)
 
 ## Basic Features
 Stage Manager aims to streamline certain use cases:
