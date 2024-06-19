@@ -37,12 +37,21 @@ class VideoComposition:
                     }
                     if layer_duration:
                         layer['play']['t'].append(layer_duration)
-                        layer['play']['rate'] =  1
+                        layer['play']['rate'] = 1
+                    else:
+                        layer['play']['t'].append(1)
+                        layer['play']['v'] = 0
+                        layer['play']['repeat'] = True
 
                 if 't' not in layer['play']:
                     layer['play']['t'] = [0]
                     if layer_duration:
                         layer['play']['t'].append(layer_duration)
+                    else:
+                        layer['play']['t'].append(1)
+                        layer['play']['v'] = 0
+                        layer['play']['repeat'] = True
+                        
             if 'next_scenes' not in scene:
                 scene['next_scenes'] = []
         for scene_id, scene in self.source['scenes'].items():
@@ -161,6 +170,6 @@ class VideoComposition:
                 for layer in next_scene['layers']:
                     screen['layers'].append(self.adjust_layer(layer, next_scene_start, stage))
         for media in preloads:
-            update['buffer_tuning'][media] = {'pin': 0.5}
+            update['buffer_tuning'][media] = {'pin': 0.1}
         self.pivid_server.send_script(update)
 
