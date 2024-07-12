@@ -143,8 +143,10 @@ class CTSpreadsheetAccess:
             if len(raw_row):
                 row = {}
                 next_scenes = set()
-                for i in range(0, min(len(raw_row), len(headers))):
+                for i in range(0, len(raw_row)):
                     row[headers[i]] = raw_row[i]
+                for i in range(len(raw_row), len(headers)):
+                    row[headers[i]] = None
                 if not row['name']:
                     continue
                 scene = {'layers': [], 'stage_direction': [], 'next_scenes': []}
@@ -161,30 +163,31 @@ class CTSpreadsheetAccess:
                     next_scenes.update(row['extra_nexts'].split(', '))
                 if row['timed_fail_scene']:
                     scene['stage_direction'].append({'t': row['timed_fail_time'], 'addr': '/TestDrive/Messages', 'args': ["Start", row['timed_fail_scene']]})
-                if row['input_start'] is not None:
+                if row['input_start'] is not None and row['input_start'] != '':
+                    input_args = []
                     for input in self.input_names:
-                        input_args = []
-                        if input + '_verb' in row:
+                        if row[input + '_verb']:
                             input_args.extend([input, row[input + '_verb'], row[input + '_scene']])
-                            next_scenes.update(row[input + '_scene'])
+                            next_scenes.add(row[input + '_scene'])
                     scene['stage_direction'].append({'t': row['input_start'], 'addr': '/TestDrive/Inputs', 'args': input_args})
-                if row['input_stop'] is not None:
-                    scene['stage_direction'].append({'t': row['input_stop'], 'addr': '/TestDrive/Messages', 'args': ['Clear']})
+                if row['input_stop'] is not None and row['input_stop'] != '':
+                    scene['stage_direction'].append({'t': row['input_stop'], 'addr': '/TestDrive/Inputs', 'args': ['Clear']})
                 if row['timer_verb']:
                     if row['timer_verb'] == 'Start':
                         scene['stage_direction'].append(
                             {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene'], row['timer_len']]})
-                        next_scenes.update(row['timer_scene'])
+                        next_scenes.add(row['timer_scene'])
                     elif row['timer_verb'] == 'Redirect':
                         scene['stage_direction'].append(
                             {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene']]})
-                        next_scenes.update(row['timer_scene'])
+                        next_scenes.add(row['timer_scene'])
                     if row['timer_verb'] == 'Stop':
                         scene['stage_direction'].append(
                             {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb']]})
                 if row['audio_event']:
                     scene['stage_direction'].append({'t': row['audio_event_time'], 'addr': '/TestDrive/Audio', 'args': row['audio_event'].split()})
-            if len(next_scenes):
-                scene['next_scenes'] = list('next_scenes')
-            config['scenes'].update(row['name'], scene)
+                if len(next_scenes):
+                    scene['next_scenes'] = list(next_scenes)
+                config['scenes'][row['name']] = scene
+                print(f"Adding scene {row['name']}")
         return config
