@@ -88,7 +88,7 @@ class CTSpreadsheetAccess:
                         else:
                             row['input_start'] = directive['t']
                             for i in range(0, len(directive['args']), 3):
-                                self.(row, directive['args'][i], directive['args'][i + 1], self.fix_name(directive['args'][i + 2]))
+                                self.export_action(row, directive['args'][i], directive['args'][i + 1], self.fix_name(directive['args'][i + 2]))
                                 next_scenes.add(self.fix_name(directive['args'][i+2]))
                     elif directive['addr'] == '/TestDrive/Audio':
                         row['audio_event_time'] = directive['t']
