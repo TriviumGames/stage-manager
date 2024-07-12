@@ -21,7 +21,7 @@ class PividControl:
             print(f"Loading config json {filename}")
             with open(filename, 'r') as f:
                 self.config = PividControl.merge_dicts(self.config, json.load(f))
-        for filename in glob.iglob(f"{args.config_dir}/*.ods"):
+        for filename in glob.iglob(f"{args.config_dir}/*.xlsx"):
             print(f"Loading config spreadsheet {filename}\n")
             self.config = PividControl.merge_dicts(self.config, spreadsheet.load(filename))
 
