@@ -7,8 +7,8 @@ import signal
 import subprocess
 
 def main(args):
-    source_dir = args.source_dir
-    target_dir = args.target_dir
+    source_dir: str = args.source_dir
+    target_dir: str = args.target_dir
     source_files = []
     target_files = []
     to_delete = []

@@ -3,6 +3,7 @@ import math
 import video_composition
 import time
 import pivid_server
+import ct_spreadsheet_access
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -14,33 +15,42 @@ import json
 class PividControl:
     def __init__(self, args):
         self.config = dict()
+        spreadsheet = ct_spreadsheet_access.CTSpreadsheetAccess()
 
-        for filename in glob.iglob(f'{args.config_dir}/*.json'):
-            print(f"Loading config file {filename}")
+        for filename in glob.iglob(f"{args.config_dir}/*.json"):
+            print(f"Loading config json {filename}")
             with open(filename, 'r') as f:
                 self.config = PividControl.merge_dicts(self.config, json.load(f))
+        for filename in glob.iglob(f"{args.config_dir}/*.ods"):
+            print(f"Loading config spreadsheet {filename}\n")
+            self.config = PividControl.merge_dicts(self.config, spreadsheet.load(filename))
 
         self.pivid_config = self.config['pivid']
         self.osc_config = self.config['osc']
 
-        if args.mock_pivid:
-            print("Mocking pivid. Neener neener")
-            self.pivid_server = pivid_server.MockPividServer()
+        if args.export:
+            self.go = self.export
+            self.export_filename = args.export
         else:
-            self.pivid_server = pivid_server.PividServer(self.pivid_config['server'])
-        self.network_notifier = network_notifier.NetworkNotifier(self.config)
-        self.comp = video_composition.VideoComposition(self.pivid_server)
-        self.comp.load_from_dict(self.config)
-        self.osc_dispatcher = Dispatcher()
-        self.osc_dispatcher.map('/Pivid/StartScene', self.osc_start_scene)
-        self.osc_dispatcher.map('/Pivid/ChangeScene', self.osc_change_scene)
-        self.comp.send_update()
-        self.osc_server = None
-        self.start_time = time.time()
-        self.scheduler = AsyncIOScheduler()
-        self.scene_jobs = dict() # map of stage_id to list of pending job
+            self.go = self.run_forever
+            if args.mock_pivid:
+                print("Mocking pivid. Neener neener")
+                self.pivid_server = pivid_server.MockPividServer()
+            else:
+                self.pivid_server = pivid_server.PividServer(self.pivid_config['server'])
+            self.network_notifier = network_notifier.NetworkNotifier(self.config)
+            self.comp = video_composition.VideoComposition(self.pivid_server)
+            self.comp.load_from_dict(self.config)
+            self.osc_dispatcher = Dispatcher()
+            self.osc_dispatcher.map('/Pivid/StartScene', self.osc_start_scene)
+            self.osc_dispatcher.map('/Pivid/ChangeScene', self.osc_change_scene)
+            self.comp.send_update()
+            self.osc_server = None
+            self.start_time = time.time()
+            self.scheduler = AsyncIOScheduler()
+            self.scene_jobs = dict() # map of stage_id to list of pending job
 
-    def merge_dicts( a, b, path=None):
+    def merge_dicts( a: dict, b: dict, path=None):
         "merges b into a"
         if path is None: path = []
         for key in b:
@@ -86,8 +96,6 @@ class PividControl:
         self.register_scene_events(stage_id, events)
         self.comp.send_update()
 
-
-
     def tick(self):
         self.comp.start_scene('fullscreen', 'intro_star')
         self.comp.send_update()
@@ -99,6 +107,13 @@ class PividControl:
         transport, protocol = await self.osc_server.create_serve_endpoint()
         await asyncio.sleep(math.inf)
 
+    def export(self):
+        print(f"Exporting to {self.export_filename}\n")
+        spreadsheet = ct_spreadsheet_access.CTSpreadsheetAccess()
+        spreadsheet.save(self.config, self.export_filename)
+
+
     def run_forever(self):
+        self.comp.send_update()
         asyncio.run(self.start())
 

@@ -2,7 +2,9 @@ from pythonosc import udp_client
 
 
 class NetworkNotifier:
-    def __init__(self, config):
+    osc_scene_start_address: str
+
+    def __init__(self, config: dict):
         self.osc_server = config.get('osc', {}).get('server')
         if self.osc_server:
             parts = self.osc_server.split(':')
@@ -14,10 +16,10 @@ class NetworkNotifier:
             self.osc_client = None
 
 
-    def send_cue(self, osc_address, args):
+    def send_cue(self, osc_address: str, args: list):
         if self.osc_client:
             self.osc_client.send_message(osc_address, args)
 
-    def send_scene_start(self, stage_id, scene_id):
+    def send_scene_start(self, stage_id: str, scene_id: str):
         if self.osc_scene_start_address:
             self.send_cue(self.osc_scene_start_address, [stage_id, scene_id])

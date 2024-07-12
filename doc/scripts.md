@@ -1,5 +1,7 @@
 # Stage Manager Scripting
 
+Stage Manager scripts are loaded from json files in the `config_dir`.  See [configuration](config.md) for more details.
+
 ## Concepts
 
 ### `outputs`
@@ -15,13 +17,13 @@ A `scene` can never be played without a `stage` to play it on, and each `stage` 
 
 `stages` do not have a direct Pivid equivalent.
 
-Stages can be tagged with `"rotate": 180` and/or `"reflect": true` to affect everything played on that stage.  These will not override the output's settings, but will combine with them. 
+Stages can be tagged with `"rotate": 180` and/or `"reflect": true` to affect everything played on that stage.  These will not override the output's settings, but will combine with them.  (i.e., of both the stage and the scene says reflect:true, that will end up doubly reflected, i.e. normal)
 
 ### `scenes`
 A scene represents a some group of media that plays, with various playback parameters, timed markers (`cues`) for callbacks, and hints for which scenes to prebuffer.
 
 #### `layers`
-An array of layers, each of with with a `media` filename, and various position and time parameters. If no position parameters are specified, the layer will be expanded to fit the `stage`'s area (maintaining aspect ratio). 
+An array of layers, each with a `media` filename, and various position and time parameters. If no position parameters are specified, the layer will be expanded to fit the `stage`'s area (maintaining aspect ratio). 
 
 If no time parameters are specified, the media will start at the beginning of the scene, and play at regular speed until it is over.  
 
@@ -35,7 +37,7 @@ Currently if any layers have non-default time parameters, the `duration` will be
 
 #### `autopilot`
 
-When this scene is done, `autopilot` says the next `scene` to play on the same `stage`.
+When this scene is done, `autopilot` specifies which other `scene` to immediately play on the same `stage`.  This ought to be frame-perfect.
 
 #### `next_scenes`
 
@@ -45,4 +47,4 @@ When this scene is done, `autopilot` says the next `scene` to play on the same `
 
 `cues` is an optional array of timed markers, and network messages to be sent when said marker is reached.  If the `scene` changes before the timestamp is reached, then the message will not be sent. Similarly if the `scene` is entered after the timestamp, then that message will not be sent.
 
-Each message has a time `t`, an OSC address `addr`, and an array of `args`, and will be sent to the configured host/port (see [command line arguments](running.md))
+Each message has a time `t`, an OSC address `addr`, and an array of `args`, and will be sent to the configured host/port (see [network configuration](config.md))

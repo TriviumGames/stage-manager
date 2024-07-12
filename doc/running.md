@@ -27,7 +27,7 @@ Notable arguments:
 * `--config_dir=«dir with config files»` - Required.  A folder full of json [scripts and settings](scripts.md) to run
 * `--mock-pivid` - Optional, for testing. Instead of communicating with a pivid server, uses a mockup, that reports all media durations as 5s, and just prints pivid updates to stdout.
 
-Note that upon startup, Stage Manager reads the script file, and then caches media metadata from Pivid, which has the following implications
+Note that upon startup, Stage Manager reads the config and script files, and then caches media metadata from Pivid, which has the following implications
 * Pivid must be running before Stage Manager is started.  However, it is okay to exit and re-start Pivid once Stage Manager is running
 * If the script file is changed, Stage Manager must be restarted for those changes to take effect.
 * If the lenghts of the media files have changed, Stage Manager must be restarted to recognize those changes.
