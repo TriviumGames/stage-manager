@@ -20,5 +20,6 @@ if __name__ == '__main__':
     parser.add_argument('--config_dir', help='Config dir to use', required=True)
     parser.add_argument('--mock_pivid', help='Boolean: mock up pivid for testing', action='store_true',)
     parser.add_argument('--export', help='Read config, export to a file [name follows], and exit')
+    parser.add_argument('--update_cues', help='Update cue data from script/spreadsheet [dir follows], and exit')
     args = parser.parse_args()
     main(args)

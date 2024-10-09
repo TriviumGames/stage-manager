@@ -43,9 +43,6 @@ class CTSpreadsheetAccess:
         print(f"Fields: {self.column_names.keys()}\n")
         pass
 
-    def load(self, filename: str):
-        pass
-
     @staticmethod
     def export_action(row: dict, input: str, verb: str, scene: str):
         row[input + '_verb'] = verb

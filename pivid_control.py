@@ -11,6 +11,8 @@ import network_notifier
 import glob
 import json
 
+from cue_file_output import CueScript
+
 
 class PividControl:
     def __init__(self, args):
@@ -31,6 +33,10 @@ class PividControl:
         if args.export:
             self.go = self.export
             self.export_filename = args.export
+        elif args.update_cues:
+            self.go = self.update_cues
+            self.cues_dir = args.update_cues
+            pass
         else:
             self.go = self.run_forever
             if args.mock_pivid:
@@ -112,6 +118,14 @@ class PividControl:
         spreadsheet = ct_spreadsheet_access.CTSpreadsheetAccess()
         spreadsheet.save(self.config, self.export_filename)
 
+    def update_cues(self):
+        for name, scene in self.config['scenes'].items():
+            filename = f"{self.cues_dir}/{name}.txt"
+            cue = CueScript(filename)
+            if 'stage_direction' in scene:
+                cue.clear_generated_lines()
+                cue.merge_with_stage_direction(scene['stage_direction'])
+            cue.save()
 
     def run_forever(self):
         self.comp.send_update()
