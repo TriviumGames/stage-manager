@@ -20,6 +20,7 @@ class CTSpreadsheetAccess:
         self.column_names['vid_loop'] = None
         self.column_names['invis_vid'] = None
         self.column_names['autopilot'] = None
+        self.column_names['checkpoint'] = None
         self.column_names['extra_nexts'] = None
         self.column_names['timed_fail_time'] = None
         self.column_names['timed_fail_scene'] = None
@@ -156,6 +157,8 @@ class CTSpreadsheetAccess:
                     scene['layers'].append(layer)
                 if row['autopilot']:
                     scene['autopilot'] = row['autopilot']
+                if row['checkpoint']:
+                    scene['stage_direction'].append({'t': 0, 'addr': '/TestDrive/Messages', 'args': ['Checkpoint', row['checkpoint']]})
                 if row['extra_nexts']:
                     next_scenes.update(row['extra_nexts'].split(', '))
                 if row['timed_fail_scene']:
