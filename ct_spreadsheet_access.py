@@ -160,6 +160,7 @@ class CTSpreadsheetAccess:
                     next_scenes.update(row['extra_nexts'].split(', '))
                 if row['timed_fail_scene']:
                     scene['stage_direction'].append({'t': row['timed_fail_time'], 'addr': '/TestDrive/Messages', 'args': ["Start", row['timed_fail_scene']]})
+                    next_scenes.add(row['timed_fail_scene'])
                 if row['input_start'] is not None and row['input_start'] != '':
                     input_args = []
                     for input in self.input_names:
