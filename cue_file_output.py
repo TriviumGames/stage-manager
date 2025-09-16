@@ -1,10 +1,16 @@
+import datetime
+import os
+
 
 class CueScript:
     filename: str
+    relativeFilename: str
     lines: list
+    update_time: datetime
 
-    def __init__(self, filename):
+    def __init__(self, filename, update_time):
         self.filename = filename
+        self.update_time = update_time
         try:
             with open(self.filename, 'r') as f:
                 self.lines = f.readlines()
@@ -27,6 +33,7 @@ class CueScript:
         next_time = cur_time
         my_idx = 0
         stage_idx = 0
+
         while stage_idx < len(stage_direction):
             next_stage_time = int(stage_direction[stage_idx]['t'] * 1000)
 
@@ -58,6 +65,7 @@ class CueScript:
             self.lines.insert(my_idx, f"\t{stage_direction[stage_idx]['addr']} {' '.join(map(str, stage_direction[stage_idx]['args']))}")
             my_idx = my_idx + 1
             stage_idx = stage_idx + 1
+        self.lines.insert(0, f"\tTRACE\tStarting scene: {os.path.basename(self.filename)} (updated at {self.update_time})")
 
     def save(self):
         with open(self.filename, 'w') as f:

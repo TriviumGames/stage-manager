@@ -38,6 +38,9 @@ class CTSpreadsheetAccess:
         self.column_names['audio_event'] = None
         self.column_names['alert_on'] = None
         self.column_names['alert_off'] = None
+        self.column_names['scene_length'] = None
+        self.column_names['audio_offset'] = None
+        self.column_names['music_directive'] = None
         self.column_names['note'] = None
 
 
@@ -158,11 +161,11 @@ class CTSpreadsheetAccess:
                 if row['autopilot']:
                     scene['autopilot'] = row['autopilot']
                 if row['checkpoint']:
-                    scene['stage_direction'].append({'t': 0, 'addr': '/TestDrive/Messages', 'args': ['Checkpoint', row['checkpoint']]})
+                    scene['stage_direction'].append({'t': 0, 'addr': '/Feature/Messages', 'args': ['Checkpoint', row['checkpoint']]})
                 if row['extra_nexts']:
                     next_scenes.update(row['extra_nexts'].split(', '))
                 if row['timed_fail_scene']:
-                    scene['stage_direction'].append({'t': row['timed_fail_time'], 'addr': '/TestDrive/Messages', 'args': ["Start", row['timed_fail_scene']]})
+                    scene['stage_direction'].append({'t': row['timed_fail_time'], 'addr': '/Feature/Messages', 'args': ["Start", row['timed_fail_scene']]})
                     next_scenes.add(row['timed_fail_scene'])
                 if row['input_start'] is not None and row['input_start'] != '':
                     input_args = []
@@ -170,23 +173,28 @@ class CTSpreadsheetAccess:
                         if row[input + '_verb']:
                             input_args.extend([input, row[input + '_verb'], row[input + '_scene']])
                             next_scenes.add(row[input + '_scene'])
-                    scene['stage_direction'].append({'t': row['input_start'], 'addr': '/TestDrive/Inputs', 'args': input_args})
+                    scene['stage_direction'].append({'t': row['input_start'], 'addr': '/Feature/Inputs', 'args': input_args})
                 if row['input_stop'] is not None and row['input_stop'] != '':
-                    scene['stage_direction'].append({'t': row['input_stop'], 'addr': '/TestDrive/Inputs', 'args': ['Clear']})
+                    scene['stage_direction'].append({'t': row['input_stop'], 'addr': '/Feature/Inputs', 'args': ['Clear']})
                 if row['timer_verb']:
                     if row['timer_verb'] == 'Start':
                         scene['stage_direction'].append(
-                            {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene'], row['timer_len']]})
+                            {'t': row['timer_time'], 'addr': '/Feature/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene'], row['timer_len']]})
                         next_scenes.add(row['timer_scene'])
                     elif row['timer_verb'] == 'Redirect':
                         scene['stage_direction'].append(
-                            {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene']]})
+                            {'t': row['timer_time'], 'addr': '/Feature/Messages', 'args': ['RopesTimer', row['timer_verb'], row['timer_scene']]})
                         next_scenes.add(row['timer_scene'])
                     if row['timer_verb'] == 'Stop':
                         scene['stage_direction'].append(
-                            {'t': row['timer_time'], 'addr': '/TestDrive/Messages', 'args': ['RopesTimer', row['timer_verb']]})
+                            {'t': row['timer_time'], 'addr': '/Feature/Messages', 'args': ['RopesTimer', row['timer_verb']]})
                 if row['audio_event']:
-                    scene['stage_direction'].append({'t': row['audio_event_time'], 'addr': '/TestDrive/Audio', 'args': row['audio_event'].split()})
+                    scene['stage_direction'].append({'t': row['audio_event_time'], 'addr': 'Audio', 'args': row['audio_event'].split()})
+                if row['music_directive']:
+                    if row['music_directive'].startswith('Play'):
+                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['audio_event'].split() + [int(row['audio_offset'] * 1000)] })
+                    else:
+                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['audio_event'].split() })
                 if len(next_scenes):
                     scene['next_scenes'] = list(next_scenes)
                 config['scenes'][row['name']] = scene
