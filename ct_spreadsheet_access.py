@@ -192,9 +192,9 @@ class CTSpreadsheetAccess:
                     scene['stage_direction'].append({'t': row['audio_event_time'], 'addr': 'Audio', 'args': row['audio_event'].split()})
                 if row['music_directive']:
                     if row['music_directive'].startswith('Play'):
-                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['audio_event'].split() + [int(row['audio_offset'] * 1000)] })
+                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['music_directive'].split() + [int(row['audio_offset'] * 1000)] })
                     else:
-                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['audio_event'].split() })
+                        scene['stage_direction'].append({'t': 0, 'addr': 'Music', 'args': row['music_directive'].split() })
                 if len(next_scenes):
                     scene['next_scenes'] = list(next_scenes)
                 config['scenes'][row['name']] = scene
