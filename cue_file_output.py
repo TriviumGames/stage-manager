@@ -1,5 +1,6 @@
 import datetime
 import os
+import pprint
 
 
 class CueScript:
@@ -27,7 +28,10 @@ class CueScript:
                 idx = idx + 1
 
     def merge_with_stage_direction(self, stage_direction_input: list):
-        stage_direction = sorted(stage_direction_input, key = lambda x: x['t'])
+        try:
+            stage_direction = sorted(stage_direction_input, key = lambda x: x['t'])
+        except:
+            pprint.pprint(stage_direction_input)
         total_delay = 0
         cur_time = 0
         next_time = cur_time
