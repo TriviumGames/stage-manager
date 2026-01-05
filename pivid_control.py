@@ -123,12 +123,17 @@ class PividControl:
     def update_cues(self):
         updateTime = datetime.now()
         for name, scene in self.config['scenes'].items():
-            filename = f"{self.cues_dir}/{name}.txt"
-            cue = CueScript(filename, updateTime)
-            if 'stage_direction' in scene:
-                cue.clear_generated_lines()
-                cue.merge_with_stage_direction(scene['stage_direction'])
-            cue.save()
+            try:
+                filename = f"{self.cues_dir}/{name}.txt"
+                cue = CueScript(filename, updateTime)
+                if 'stage_direction' in scene:
+                    cue.clear_generated_lines()
+                    cue.merge_with_stage_direction(scene['stage_direction'])
+                cue.save()
+            except:
+                print (f"Error proccessing {name}")
+                raise
+
 
     def run_forever(self):
         self.comp.send_update()
