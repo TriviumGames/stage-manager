@@ -28,7 +28,6 @@ class CueScript:
                 idx = idx + 1
 
     def merge_with_stage_direction(self, stage_direction_input: list):
-        stage_direction = []
         try:
             stage_direction = sorted(stage_direction_input, key = lambda x: x['t'])
         except:
