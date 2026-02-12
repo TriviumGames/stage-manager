@@ -1,0 +1,13 @@
+APScheduler==3.11.2
+certifi==2026.1.4
+charset-normalizer==3.4.4
+et_xmlfile==2.0.0
+idna==3.11
+lml==0.2.0
+openpyxl==3.1.5
+pyexcel-io==0.6.7
+pyexcel-xlsx==0.6.1
+python-osc==1.9.3
+requests==2.32.5
+tzlocal==5.3.1
+urllib3==2.6.3
